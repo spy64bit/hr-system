@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/db";
 import { employees } from "@/db/schema";
 import Link from "next/link";
 import CreateEmployeeForm from "@/components/employees/CreateEmployeeForm";
+
+export const metadata: Metadata = {
+    title: "New Employee",
+};
 
 export default async function NewEmployeePage() {
     const session = await requireRole(["admin", "hr"]);

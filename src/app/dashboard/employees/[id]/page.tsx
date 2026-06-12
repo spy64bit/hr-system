@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/db";
 import { employees } from "@/db/schema";
@@ -10,6 +11,10 @@ import SelfEditForm from "@/components/employees/SelfEditForm";
 import ResetPasswordForm from "@/components/employees/ResetPasswordForm";
 import DeleteButton from "@/components/employees/DeleteButton";
 import type { UserRole } from "@/auth";
+
+export const metadata: Metadata = {
+    title: "Employee Details",
+};
 
 const ROLE_BADGE: Record<string, string> = {
     admin: "bg-purple-100 text-purple-700",
@@ -55,15 +60,16 @@ export default async function EmployeeDetailPage({
     if (!employee) notFound();
 
     // Access control
+    const isSelf = sessionUserId === employeeId;
     if (role === "employee") {
-        if (sessionUserId !== employeeId) redirect("/dashboard");
+        if (!isSelf) redirect("/dashboard");
     } else if (role === "manager") {
-        if (employee.managerId !== sessionUserId) redirect("/dashboard");
+        if (!isSelf && employee.managerId !== sessionUserId) redirect("/dashboard");
     }
     // admin and hr: full access
 
     const isAdminOrHr = role === "admin" || role === "hr";
-    const isManager = role === "manager";
+    const isManager = role === "manager" && !isSelf;
 
     // For admin/hr: load other employees for the manager dropdown
     const otherEmployees =
@@ -159,8 +165,8 @@ export default async function EmployeeDetailPage({
                 </div>
             )}
 
-            {/* Employee: self-service — name editable, rest read-only */}
-            {role === "employee" && (
+            {/* Employee or manager viewing own profile: name editable, rest read-only */}
+            {(role === "employee" || (role === "manager" && isSelf)) && (
                 <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                     <h2 className="text-base font-semibold text-gray-800 mb-5">My Profile</h2>
                     <SelfEditForm

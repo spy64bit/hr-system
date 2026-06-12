@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/db";
 import { employees, leaveRequests } from "@/db/schema";
@@ -5,6 +6,10 @@ import { eq, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import LeaveRequestForm from "@/components/leave/LeaveRequestForm";
 import CancelButton from "@/components/leave/CancelButton";
+
+export const metadata: Metadata = {
+    title: "Leave Requests",
+};
 
 const LEAVE_TYPE_LABEL: Record<string, string> = {
     annual: "Annual",

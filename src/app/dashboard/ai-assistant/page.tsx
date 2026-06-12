@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { requireAuth } from "@/lib/auth";
 import AIChatInterface from "@/components/ai-assistant/AIChatInterface";
+
+export const metadata: Metadata = {
+    title: "AI Assistant",
+};
 
 export default async function AIAssistantPage() {
     await requireAuth();

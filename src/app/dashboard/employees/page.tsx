@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/db";
 import { employees } from "@/db/schema";
 import { alias } from "drizzle-orm/pg-core";
 import { eq, or, ilike } from "drizzle-orm";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: "Employees",
+};
 
 const ROLE_BADGE: Record<string, string> = {
     admin: "bg-purple-100 text-purple-700",

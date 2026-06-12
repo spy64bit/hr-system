@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/db";
 import { employees, payslips } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import PayrollControls from "@/components/payroll/PayrollControls";
 import DraftPayslipRow from "@/components/payroll/DraftPayslipRow";
+
+export const metadata: Metadata = {
+    title: "Payroll",
+};
 
 const MONTHS = [
     "January", "February", "March", "April", "May", "June",

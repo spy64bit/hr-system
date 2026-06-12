@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/db";
 import { employees, leaveRequests } from "@/db/schema";
@@ -5,6 +6,10 @@ import { eq, and, ne, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getApprovalScope } from "@/lib/validations/leave";
 import ApprovalActions from "@/components/leave/ApprovalActions";
+
+export const metadata: Metadata = {
+    title: "Leave Approvals",
+};
 
 const LEAVE_TYPE_LABEL: Record<string, string> = {
     annual: "Annual",

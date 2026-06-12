@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import SignOutButton from "@/components/SignOutButton";
+
+export const metadata: Metadata = {
+    title: "Dashboard",
+};
 
 export default async function DashboardPage() {
     const session = await auth();

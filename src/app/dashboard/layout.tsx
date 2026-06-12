@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { UserRole } from "@/auth";
+import SidebarUserMenu from "@/components/SidebarUserMenu";
 
 const navItems: {
     href: string;
@@ -59,7 +60,7 @@ export default async function DashboardLayout({
     );
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
             <aside className="w-56 shrink-0 border-r border-gray-200 bg-white flex flex-col">
                 <div className="px-5 py-5 border-b border-gray-200">
@@ -78,10 +79,7 @@ export default async function DashboardLayout({
                         </Link>
                     ))}
                 </nav>
-                <div className="px-4 py-4 border-t border-gray-200">
-                    <p className="text-xs text-gray-400 truncate">{session.user.email}</p>
-                    <p className="text-xs text-gray-400 capitalize">{role}</p>
-                </div>
+                <SidebarUserMenu email={session.user.email ?? ""} role={role} />
             </aside>
 
             {/* Main content */}
