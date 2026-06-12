@@ -4,7 +4,7 @@
 
 A full-stack HR management system built with Next.js 16 (App Router), TypeScript, Drizzle ORM, and PostgreSQL. It covers the core HR workflows a small-to-medium company would need: employee records and org hierarchy, leave requests with role-based approval routing, payroll with Malaysian statutory deductions (EPF/SOCSO/EIS/PCB), and an AI Assistant powered by Google Gemini for natural-language HR queries.
 
-Built as a companion piece to [my Laravel inventory management system](https://github.com/), demonstrating the same architectural patterns — role-based auth, AI-assisted natural language actions, and two-step confirm-before-execute flows — in a different stack (Node.js/Next.js instead of PHP/Laravel).
+Built as a companion piece to [my Laravel inventory management system](https://github.com/spy64bit/inventory), demonstrating the same architectural patterns — role-based auth, AI-assisted natural language actions, and two-step confirm-before-execute flows — in a different stack (Node.js/Next.js instead of PHP/Laravel).
 
 ---
 
@@ -164,4 +164,4 @@ These steps assume an Ubuntu VPS with Nginx (similar deployment to a Node.js app
 
 - **AI two-step flow** — `parseCommand` (Server Action) calls Gemini with structured output to parse intent and fetch any required data (e.g. leave balance). Read-only actions (`check_leave_balance`, `check_employee_info`, `check_pending_approvals`) return their result immediately. The `request_leave` action returns a confirmation card; the user must explicitly confirm before `confirmLeaveRequest` runs the full Phase 3 validation (overlap, balance, working-days) and inserts the row. This prevents the AI from silently mutating data.
 
-- **Auth in the Data Access Layer, not middleware** — `src/proxy.ts` (the Next.js middleware file) is present but is **not** the primary auth enforcement point. Per Next.js 16 security guidance, auth checks live in the DAL: every Server Action and Server Component calls `requireAuth()` or `requireRole()` from `src/lib/auth.ts` directly. This ensures auth is enforced even for direct Server Action invocations that bypass the middleware layer.
+- **Defense in depth: proxy redirects + DAL-enforced authorization** — `src/proxy.ts` handles unauthenticated page visits by redirecting to `/login` early, providing a clean UX before any page renders. However, security doesn't depend on that layer: every Server Action and Server Component independently calls `requireAuth()` or `requireRole()` from `src/lib/auth.ts`, enforcing both authentication and role checks at the point of data access. This means auth cannot be bypassed via direct Server Action calls that skip the middleware, and role-scoped access (e.g. only `hr`/`admin` reaching payroll actions) is guaranteed regardless of how a request arrives.
