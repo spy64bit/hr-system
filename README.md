@@ -104,7 +104,7 @@ These steps assume an Ubuntu VPS with Nginx (similar deployment to a Node.js app
    ```bash
    git clone <repo-url>
    cd hr-system
-   npm install --omit=dev
+   npm install
    ```
 
 2. **Set up PostgreSQL** on the VPS and create a dedicated database and user.
