@@ -65,3 +65,23 @@
   - Zod schemas: `src/lib/validations/employee.ts`
   - Server Actions: `src/lib/actions/employee.ts` (`createEmployee`, `updateEmployee`, `deleteEmployee`, `selfUpdateEmployee`, `resetPassword`)
   - Shared UI components: `src/components/employees/` (`FormField`, `CreateEmployeeForm`, `EditEmployeeForm`, `SelfEditForm`, `ResetPasswordForm`, `DeleteButton`)
+
+- **Leave Requests & Approvals**
+  - `/dashboard/leave-requests` — all roles; submit form + table of own requests
+    - Leave types: annual / sick / unpaid / emergency
+    - Days counted as **working days only** (Mon–Fri, no weekends)
+    - Annual leave: validates against `annualLeaveBalance` before inserting
+    - Overlap validation: blocks submission if pending/approved request overlaps date range
+    - Reason required for `unpaid` and `emergency` types
+    - Cancel own pending requests (deletes the row)
+    - Status badges: pending=yellow, approved=green, rejected=red
+  - `/dashboard/approvals` — manager/hr/admin only; scoped pending requests per hierarchy
+    - Approve: sets `approved`, decrements `annualLeaveBalance` in a transaction for annual
+    - Reject: sets `rejected`
+    - Scope logic: manager sees direct reports; hr sees all except self; admin sees all
+  - Zod schemas + helpers: `src/lib/validations/leave.ts`
+    - `calculateLeaveDays(start, end)` — working days only
+    - `getApprovalScope(approverRole, approverId)` — returns typed scope descriptor
+    - `createLeaveSchema` — with cross-field validation
+  - Server Actions: `src/lib/actions/leave.ts` (`submitLeaveRequest`, `cancelLeaveRequest`, `approveLeaveRequest`, `rejectLeaveRequest`)
+  - Client Components: `src/components/leave/` (`LeaveRequestForm`, `CancelButton`, `ApprovalActions`)
