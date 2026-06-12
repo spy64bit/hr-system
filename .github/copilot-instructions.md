@@ -85,3 +85,20 @@
     - `createLeaveSchema` — with cross-field validation
   - Server Actions: `src/lib/actions/leave.ts` (`submitLeaveRequest`, `cancelLeaveRequest`, `approveLeaveRequest`, `rejectLeaveRequest`)
   - Client Components: `src/components/leave/` (`LeaveRequestForm`, `CancelButton`, `ApprovalActions`)
+
+- **Payroll**
+  - `/dashboard/payroll` — hr/admin only; month/year selector, generate payslips, inline draft editing, finalize
+    - "Generate Payslips" creates draft payslips for all employees not yet covered for that period
+    - Draft rows: bonuses and otherDeductions editable inline; saving recalculates netSalary
+    - "Finalize" is irreversible — sets status=`finalized` + `finalizedAt`
+    - Finalized rows: read-only, no controls
+  - `/dashboard/payroll/my-payslips` — all roles; shows own finalized payslips only
+  - `/dashboard/payroll/my-payslips/[id]` — read-only payslip breakdown, printable; ownership + finalized check
+  - Pure calc fn: `src/lib/payroll.ts` → `calculatePayslip(baseSalary, bonuses?, otherDeductions?)`
+    - EPF: 11% of baseSalary
+    - SOCSO: 0.5%, capped RM 19.75
+    - EIS: 0.2%, capped RM 9.90
+    - PCB: tiered (0 / 5% / 10%) — simplified, not legally accurate
+    - netSalary = baseSalary + bonuses − EPF − SOCSO − EIS − PCB − otherDeductions
+  - Server Actions: `src/lib/actions/payroll.ts` (`generatePayslips`, `updatePayslipAdjustments`, `finalizePayslip`)
+  - Client Components: `src/components/payroll/` (`PayrollControls`, `DraftPayslipRow`, `PrintButton`)
