@@ -6,6 +6,7 @@
 - NextAuth v5 (Credentials provider, JWT strategy, no adapter)
 - Tailwind CSS (no component library yet)
 - Server Actions for all mutations (no API routes except NextAuth)
+- `@google/genai` for AI features (NOT deprecated `@google/generative-ai`)
 
 ## Database
 - src/db/schema.ts — 3 tables: `employees`, `leaveRequests`, `payslips`
@@ -102,3 +103,23 @@
     - netSalary = baseSalary + bonuses − EPF − SOCSO − EIS − PCB − otherDeductions
   - Server Actions: `src/lib/actions/payroll.ts` (`generatePayslips`, `updatePayslipAdjustments`, `finalizePayslip`)
   - Client Components: `src/components/payroll/` (`PayrollControls`, `DraftPayslipRow`, `PrintButton`)
+
+- **AI Assistant**
+  - `/dashboard/ai-assistant` — all roles; natural language HR commands
+  - Uses `@google/genai`: `import { GoogleGenAI, Type } from "@google/genai"`, init with `new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })`
+  - Call: `ai.models.generateContent({ model, contents, config: { systemInstruction, responseMimeType: "application/json", responseSchema: {...} } })`
+  - `responseSchema` uses `Type` enum (Type.STRING, Type.OBJECT, Type.ARRAY, Type.NUMBER, Type.BOOLEAN); `response.text` returns JSON string
+  - Env: `GEMINI_API_KEY` (required), `GEMINI_MODEL` (default `gemini-2.0-flash`)
+  - Two-step flow: parse intent → read-only actions execute immediately; `request_leave` shows confirmation card
+  - Supported actions: `check_leave_balance`, `check_employee_info`, `check_pending_approvals`, `request_leave`, `unknown`
+  - `request_leave` is always scoped to the logged-in user — never creates leave for someone else
+  - Employee list injected into system prompt, scoped by role (admin/hr: all; manager: self+reports; employee: self only)
+  - `matchedEmployeeId` verified server-side against scoped list before any DB query (security boundary)
+  - In-memory rate limiter: 20 req/min per user (Map in server action module)
+  - Server Actions: `src/lib/actions/ai-assistant.ts` (`parseCommand`, `confirmLeaveRequest`)
+    - `parseCommand` returns `AIParseResult` — includes `queryResult` for read-only actions and `leaveDays` for leave requests
+    - `confirmLeaveRequest` runs full Phase 3 validation (overlap, balance, working-days) before insert
+  - Client Component: `src/components/ai-assistant/AIChatInterface.tsx`
+    - Chat-style UI: user messages right-aligned, AI responses left-aligned
+    - Stateless per session (no persistence — page reload clears chat)
+    - No streaming, no queues
