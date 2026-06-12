@@ -19,6 +19,11 @@ const navItems: {
             allowedRoles: ["admin", "hr", "manager", "employee"],
         },
         {
+            href: "/dashboard/ai-assistant",
+            label: "AI Assistant",
+            allowedRoles: ["admin", "hr", "manager", "employee"],
+        },
+        {
             href: "/dashboard/payroll/my-payslips",
             label: "My Payslips",
             allowedRoles: ["admin", "hr", "manager", "employee"],
